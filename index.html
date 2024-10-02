@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circle Drift 1.5</title>
+     <style>
+    body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Georgia, serif;
+    overflow: hidden;
+    background: linear-gradient(to bottom, #87CEEB, #FFFFFF); /* Sky gradient */
+    background-size: 200% 200%; /* Increase size for smooth animation */
+    animation: lightMovement 30s ease-in-out infinite; /* Apply animation */
+}
+
+    .sky {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: -1;
+    }
+
+    .cloud {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 50px;
+        width: 200px;
+        height: 60px;
+        box-shadow: 50px 30px 0 20px rgba(255, 255, 255, 0.8),
+                    100px 40px 0 30px rgba(255, 255, 255, 0.8),
+                    150px 20px 0 20px rgba(255, 255, 255, 0.8);
+        animation: moveClouds 20s linear infinite;
+    }
+
+    .cloud::before, .cloud::after {
+        content: '';
+        position: absolute;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+    }
+
+    .cloud::before {
+        bottom: -30px;
+        left: 30px;
+        box-shadow: 20px 10px 0 5px rgba(255, 255, 255, 0.8),
+                    40px 20px 0 10px rgba(255, 255, 255, 0.8);
+    }
+
+    .cloud::after {
+        bottom: -30px;
+        right: 30px;
+        box-shadow: -20px 10px 0 5px rgba(255, 255, 255, 0.8),
+                    -40px 20px 0 10px rgba(255, 255, 255, 0.8);
+    }
+
+    .cloud:nth-child(2) {
+        top: 20%;
+        animation-duration: 25s;
+        opacity: 0.9;
+    }
+
+    .cloud:nth-child(3) {
+        top: 40%;
+        animation-duration: 30s;
+        opacity: 0.8;
+    }
+
+    .cloud:nth-child(4) {
+        top: 60%;
+        animation-duration: 35s;
+        opacity: 0.7;
+    }
+
+    .cloud:nth-child(5) {
+        top: 80%;
+        animation-duration: 40s;
+        opacity: 0.6;
+    }
+
+    @keyframes moveClouds {
+        0% {
+            left: 100%;
+            opacity: 0;
+        }
+        20% {
+            opacity: 1;
+        }
+        80% {
+            opacity: 1;
+        }
+        100% {
+            left: -200px;
+            opacity: 0;
+        }
+    }
+
+    /* Game Styles */
+    h1 {
+        color: black;
+        text-align: center;
+        font-size: 3em;
+        text-shadow: 2px 2px #aaa;
+    }
+
+    h2, h3 {
+        color: black;
+        text-align: center;
+        text-shadow: 1px 1px #ddd;
+    }
+
+#game-container {
+    position: relative;
+    width: 80vw;
+    height: 70vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(224, 243, 250, 1) 100%);
+    border-radius: 30px;
+    box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.15);
+    border: 5px solid rgba(0, 150, 255, 0.3);
+    overflow: hidden;
+    transition: transform 0.3s ease-in-out;
+}
+
+#game-container:hover {
+    transform: scale(1.02);
+}
+
+#game-area {
+    position: relative;
+    width: 95%;
+    flex: 1;
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 3px solid #89CFF0;
+    border-radius: 20px;
+    box-shadow: inset 0px 0px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    #game-area {
+        position: relative;
+        width: 100%;
+        flex: 1;
+        background-color: rgba(255, 255, 255, 0.9);
+        border: 3px solid #bbb;
+        border-radius: 15px;
+        overflow: hidden;
+        display: none;
+    }
+
+  .circle {
+    position: absolute;
+    border-radius: 50%;
+    background: linear-gradient(to bottom, #ff6347, #f62217); /* Gradient for red circles */
+    border: 2px solid #b22222; /* Darker border */
+    width: 85px;
+    height: 85px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Original shadow effect */
+    animation: popUp 0.2s ease-in-out;
+    z-index: 1;
+}
+
+.circle.blue {
+    background: linear-gradient(to bottom, #00c0ff, #317ac7); /* Gradient for blue circles */
+    border: 2px solid #1a5a99; /* Darker border */
+}
+
+@keyframes popUp {
+    0% { transform: scale(0.5); opacity: 0.5; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes burstEffect {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.5; }
+    100% { transform: scale(0); opacity: 0; }
+}
+
+@keyframes lightMovement {
+    0% {
+        background-position: 0% 0%;
+    }
+    50% {
+        background-position: 100% 100%;
+    }
+    100% {
+        background-position: 0% 0%;
+    }
+}
+
+@keyframes zoomOut {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0);
+        opacity: 0;
+    }
+}
+
+.zoom-out {
+    animation: zoomOut 0.5s ease forwards; /* Adjust timing as needed */
+}
+
+    @keyframes move {
+        from {
+            transform: translate(0, 0);
+        }
+        to {
+            transform: translate(20px, 20px);
+        }
+    }
+
+.circle.burst {
+    animation: burstEffect 0.6s ease-out;
+}
+
+.circle.disabled {
+    pointer-events: none;
+}
+
+    @keyframes dynamicBackground {
+    0% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+    100% { background-position: 0% 0%; }
+}
+
+    @keyframes backgroundPulse {
+    0% { background-color: #87CEEB; }
+    50% { background-color: #FFFFFF; }
+    100% { background-color: #87CEEB; }
+}
+
+body {
+    animation: backgroundPulse 10s infinite;
+}
+  
+body {
+    animation: dynamicBackground 60s linear infinite;
+}
+    
+    #menu-screen, #tutorial-screen, #history-screen {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+    }
+
+    button {
+        width: 110px;
+        height: 110px;
+        font-size: 18px;
+        cursor: pointer;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        line-height: 1.2;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    #start-btn {
+        background: linear-gradient(135deg, #fdbd01, #ff9000);
+    }
+
+    #tutorial-btn {
+        background: linear-gradient(135deg, #4682b4, #35699f);
+    }
+
+    #history-btn {
+        background: linear-gradient(135deg, #9acd32, #6ba81e);
+    }
+
+    #back-btn, #back-btn-history {
+        background: linear-gradient(135deg, #ff5c5c, #d93b3b);
+        color: black;
+    }
+
+    #score, #message {
+        margin-top: 20px;
+        font-size: 24px;
+        text-align: center;
+        text-shadow: 1px 1px #aaa;
+    }
+
+    #message {
+        color: red;
+        display: none;
+    }
+
+    #history-container {
+        max-height: 400px; /* Adjust as needed */
+        overflow-y: auto;
+        width: 100%;
+        margin-top: 20px;
+        padding: 10px;
+        border: 2px solid #ccc;
+        border-radius: 10px;
+        background-color: rgba(255, 255, 255, 0.8);
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #score-history {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    #score-history li {
+        margin: 5px 0;
+        font-size: 20px;
+    }
+
+    #score-history li.best-score {
+    color: black;
+    border: 2px solid black; /* Adds the black outline */
+    padding: 10px; /* Adds some padding around the text */
+    background: rgba(255, 255, 255, 0.9); /* Ensures background contrast */
+    border-radius: 10px; /* Keeps the rounded corners */
+    font-weight: bold; /* Makes the best score stand out */
+    }
+
+    .info-btn {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+        background-color: #333;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);      
+        }
+    </style>
+</head>
+<body>
+    <div class="sky">
+        <div class="cloud"></div>
+        <div class="cloud"></div>
+        <div class="cloud"></div>
+        <div class="cloud"></div>
+        <div class="cloud"></div>
+        <div class="cloud"></div>
+        <div class="cloud"></div>
+    </div>
+    <div id="menu-screen">
+        <button class="info-btn" id="info-btn">?</button>
+        <h1>Circle Drift</h1>
+        <button id="start-btn">Start Game</button>
+        <button id="tutorial-btn">Instructions</button>
+        <button id="history-btn">History</button>
+    </div>
+    <div id="tutorial-screen" style="display: none;">
+        <h1>Circle Drift</h1>
+        <h2>How to Play:</h2>
+        <h2>1. Click on red circles to increase your score.</h2>
+        <h2>2. Click on blue circles to slow down the circles for 5 seconds.</h2>
+        <h2>3. When 5 circles fill up the screen the game will end.</h2>
+        <h2>4. The game gets progressively harder as your score increases.</h2>
+        <button id="back-btn">Menu</button>
+    </div>
+    <div id="history-screen" style="display: none;">
+        <h1>Score History</h1>
+        <div id="history-container">
+            <ul id="score-history"></ul>
+        </div>
+        <button id="back-btn-history">Menu</button>
+    </div>
+    <div id="game-container" style="display: none;">
+        <div id="game-area">
+            <h1>Circle Drift</h1>
+            <h2 id="score">Score: 0</h2>
+            <h2 id="message">Circles slowed down!</h2>
+        </div>
+    </div>
+    <script>
+        let score = 0;
+        let circles = [];
+        let maxCircles = 5;
+        let gameArea = document.getElementById('game-area');
+        let gameContainer = document.getElementById('game-container');
+        let menuScreen = document.getElementById('menu-screen');
+        let tutorialScreen = document.getElementById('tutorial-screen');
+        let historyScreen = document.getElementById('history-screen');
+        let startBtn = document.getElementById('start-btn');
+        let tutorialBtn = document.getElementById('tutorial-btn');
+        let historyBtn = document.getElementById('history-btn');
+        let backBtn = document.getElementById('back-btn');
+        let backBtnHistory = document.getElementById('back-btn-history');
+        let scoreDisplay = document.getElementById('score');
+        let messageDisplay = document.getElementById('message');
+        let gameInterval;
+        let timeout;
+        let spawnRate = 1000;
+        let scoreHistory = [];
+        let powerupActive = false;
+
+        startBtn.addEventListener('click', () => {
+            menuScreen.style.display = 'none';
+            gameContainer.style.display = 'flex';
+            resetGame();
+            infoBtn.style.display = 'none'; // Hide the info button
+        });
+
+        tutorialBtn.addEventListener('click', () => {
+            menuScreen.style.display = 'none';
+            tutorialScreen.style.display = 'flex';
+            infoBtn.style.display = 'none'; // Hide the info button
+        });
+
+        backBtn.addEventListener('click', () => {
+            tutorialScreen.style.display = 'none';
+            menuScreen.style.display = 'flex';
+            infoBtn.style.display = 'block'; // Show the info button
+        });
+
+        historyBtn.addEventListener('click', () => {
+            menuScreen.style.display = 'none';
+            historyScreen.style.display = 'flex';
+            showScoreHistory();
+            infoBtn.style.display = 'none'; // Hide the info button
+        });
+
+        backBtnHistory.addEventListener('click', () => {
+            historyScreen.style.display = 'none';
+            menuScreen.style.display = 'flex';
+            infoBtn.style.display = 'block'; // Show the info button
+        });
+
+        function createCircle() {
+    if (circles.length >= maxCircles) {
+        gameOver();
+        return;
+    }
+
+    let circle = document.createElement('div'); // Create a new circle element
+    circle.classList.add('circle');
+    let x = Math.random() * (gameArea.clientWidth - 75); // Adjusted for circle size
+    let y = Math.random() * (gameArea.clientHeight - 75); // Adjusted for circle size
+    circle.style.left = x + 'px';
+    circle.style.top = y + 'px';
+
+    if (!powerupActive && Math.random() < 0.05) {
+        circle.classList.add('blue');
+    }
+
+    circle.addEventListener('click', () => {
+        circle.classList.add('disabled'); // Disable pointer events
+        circle.classList.add('burst'); // Trigger the burst animation
+        if (circle.classList.contains('blue')) {
+            applyPowerup(circle);
+        } else {
+            score++;
+            scoreDisplay.innerText = 'Score: ' + score;
+        }
+        setTimeout(() => {
+            gameArea.removeChild(circle);
+            circles = circles.filter(c => c !== circle);
+        }, 600); // Duration matches the burst animation
+        setTimeout(() => {
+            circle.classList.remove('disabled'); // Enable pointer events after animation
+            circle.classList.remove('burst'); // Remove burst class after animation
+        }, 600); // Duration matches the burst animation
+        if (score === 25 || score === 50 || score === 75 || score === 100 || score === 200 || score === 500 || score === 520 || score === 600 || score === 700 || score === 800 || score === 900 || score === 1000 || score === 1500 || score === 1950) {
+            increaseSpeed();
+        }
+    });
+
+    gameArea.appendChild(circle);
+    circles.push(circle);
+    clearTimeout(timeout);
+    timeout = setTimeout(gameOver, 2000);
+}
+
+        function applyPowerup(circle) {
+            powerupActive = true;
+            messageDisplay.innerText = 'Circles slowed down!';
+            messageDisplay.style.color = 'blue';
+            messageDisplay.style.display = 'block';
+
+            setTimeout(() => {
+                messageDisplay.style.display = 'none';
+            }, 5000);
+
+            circles.forEach(c => {
+                if (c !== circle && !c.classList.contains('blue')) {
+                    c.style.transition = 'transform 0.5s ease-out';
+                    c.style.transform = 'translate(10px, 10px)';
+                }
+            });
+
+            setTimeout(() => {
+                circles.forEach(c => {
+                    if (c !== circle && !c.classList.contains('blue')) {
+                        c.style.transition = 'transform 0.5s ease-in';
+                        c.style.transform = 'translate(0, 0)';
+                    }
+                });
+                powerupActive = false;
+            }, 5000);
+        }
+
+        function gameOver() {
+            clearInterval(gameInterval);
+            clearTimeout(timeout);
+            alert('Game Over! Your score is: ' + score);
+
+            // Save score to history
+            scoreHistory.push(score);
+
+            // Update history screen
+            showScoreHistory();
+
+            gameContainer.style.display = 'none';
+            menuScreen.style.display = 'flex';
+            infoBtn.style.display = 'block'; // Show the info button
+        }
+
+        function resetGame() {
+            score = 0;
+            circles.forEach(c => gameArea.removeChild(c));
+            circles = [];
+            scoreDisplay.innerText = 'Score: ' + score;
+            spawnRate = 1000;
+            powerupActive = false;
+            startGame();
+        }
+
+        function gameOver() {
+    clearInterval(gameInterval);
+    clearTimeout(timeout);
+
+    gameContainer.classList.add('zoom-out'); // Add zoom-out animation
+
+    setTimeout(() => {
+        alert('Game Over! Your score is: ' + score);
+
+        // Save score to history
+        scoreHistory.push(score);
+
+        // Update history screen
+        showScoreHistory();
+
+        gameContainer.style.display = 'none';
+        menuScreen.style.display = 'flex';
+        gameContainer.classList.remove('zoom-out'); // Remove the class after the animation completes
+        infoBtn.style.display = 'block'; // Show the info button
+    }, 500); // Match the delay to the animation duration (0.5s)
+}
+
+        function increaseSpeed() {
+            clearInterval(gameInterval);
+            if (score === 25) {
+                spawnRate = 800;
+                showMessage('Circles sped up!', 'red');
+            } else if (score === 50) {
+                spawnRate = 750;
+                showMessage('Circles sped up!', 'red');
+            } else if (score === 75) {
+                spawnRate = 650;
+                showMessage('Circles sped up!', 'red');
+            } else if (score === 100) {
+                spawnRate = 500;
+                showMessage('Circles sped up!', 'red');
+            } else if (score === 200) {
+                spawnRate = 450;
+                showMessage('Circles sped up!', 'red');
+            } else if (score === 500) {
+                spawnRate = 300;
+                showMessage('Survive...', 'red');
+            } else if (score === 520) {
+                spawnRate = 650;
+                showMessage('Time to rest...', 'red');
+            } else if (score === 600) {
+                spawnRate = 600;
+                showMessage('Try to reach 2000!', 'red');
+            } else if (score === 650) {
+                spawnRate = 550;
+                showMessage('You are almost halfway there!', 'red');
+            } else if (score === 700) {
+                spawnRate = 400;
+                showMessage('You are almost halfway there!', 'red');
+            } else if (score === 800) {
+                spawnRate = 550;
+                showMessage('You are almost halfway there!', 'red');
+            } else if (score === 900) {
+                spawnRate = 400;
+                showMessage('You are almost halfway there!', 'red');
+            } else if (score === 1000) {
+                spawnRate = 600;
+                showMessage('You are halfway there, lets slow it down for a moment!', 'red');
+            } else if (score === 1500) {
+                spawnRate = 450;
+                showMessage('You can do it!', 'red');
+            } else if (score === 1950) {
+                spawnRate = 400;
+                showMessage('Thanks for playing!', 'red');
+            }
+            startGame();
+        }
+
+        function showMessage(message, color) {
+            messageDisplay.innerText = message;
+            messageDisplay.style.color = color;
+            messageDisplay.style.display = 'block';
+            setTimeout(() => {
+                messageDisplay.style.display = 'none';
+            }, 2000);
+        }
+
+        function startGame() {
+            gameContainer.style.display = 'flex';
+            menuScreen.style.display = 'none';
+            gameArea.style.display = 'block';
+            gameInterval = setInterval(createCircle, spawnRate);
+        }
+
+        function showScoreHistory() {
+            const historyList = document.getElementById('score-history');
+            historyList.innerHTML = ''; // Clear existing history
+            let bestScore = Math.max(...scoreHistory, 0); // Find the best score
+            scoreHistory.forEach((score, index) => {
+                const listItem = document.createElement('li');
+                listItem.innerText = `Game ${index + 1}: ${score}`;
+                if (score === bestScore) {
+                    listItem.classList.add('best-score'); // Highlight the best score
+                }
+                historyList.appendChild(listItem);
+            });
+        }
+
+        // "?" button
+        let infoBtn = document.createElement('button');
+        infoBtn.innerText = '?';
+        infoBtn.style.position = 'absolute';
+        infoBtn.style.bottom = '10px';
+        infoBtn.style.right = '10px';
+        infoBtn.style.width = '50px';
+        infoBtn.style.height = '50px';
+        infoBtn.style.borderRadius = '50%';
+        infoBtn.style.backgroundColor = '#0c090a';
+        infoBtn.style.fontSize = '24px';
+        infoBtn.style.fontWeight = 'bold';
+        infoBtn.style.color = 'white';
+        infoBtn.addEventListener('click', () => {
+        alert("Circle Drift Credits Note:\n\n- Developer: Matthew G. Nullan\n- Early Testers:\n- Marcus Sky U. Baguio\n- Lorenzo Delfin M. Barredo\n- Charles Dominic C. Luna \n- Marius Gil M. Castro \n- Maria Leana G. Nullan \n- Castillo Johann Draeke");
+        });
+        document.body.appendChild(infoBtn);
+
+        // Initial setup
+        menuScreen.style.display = 'flex';
+        gameContainer.style.display = 'none';
+        historyScreen.style.display = 'none';
+    </script> 
+</body>
+</html>
+
+
